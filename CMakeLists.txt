@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(Main VERSION 1.0.0)
+project(example VERSION 1.0.0)
 
 if(MSVC)
     add_compile_options(/std::c++latest)
@@ -12,5 +12,22 @@ if(NOT TARGET Rasterizer)
     add_subdirectory(Rasterizer)
 endif()
 
-add_executable(${PROJECT_NAME} example.cpp)
-target_link_libraries(${PROJECT_NAME} Rasterizer)
+# build examples
+set(Executables
+    example
+    example_april
+)
+
+set(SrcFiles
+    example.cpp
+    example_april.cpp
+)
+
+list(LENGTH Executables cnt)
+math(EXPR len "${cnt} - 1")
+foreach(idx RANGE ${len})
+    list(GET Executables ${idx} exec)
+    list(GET SrcFiles ${idx} src)
+    add_executable(${exec} ${src})
+    target_link_libraries(${exec} Rasterizer)
+endforeach()

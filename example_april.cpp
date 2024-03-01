@@ -32,14 +32,14 @@ int main(){
     rasterizerlib::generate(polygon);
 
     // print
-    printf("%ld ALL intervals: \n", polygon.rasterData.allIntervals.size()/2);
+    printf("%d ALL intervals: \n", polygon.rasterData.allIntervals.size()/2);
     for(int i=0; i<polygon.rasterData.allIntervals.size()-1; i+=2) {
-        printf("    [%u,%u)\n", polygon.rasterData.allIntervals.at(i), polygon.rasterData.allIntervals.at(i+1));
+        printf("    [%d,%d)\n", polygon.rasterData.allIntervals.at(i), polygon.rasterData.allIntervals.at(i+1));
     }
 
-    printf("%ld FULL intervals: \n", polygon.rasterData.fullIntervals.size()/2);
+    printf("%d FULL intervals: \n", polygon.rasterData.fullIntervals.size()/2);
     for(int i=0; i<polygon.rasterData.fullIntervals.size()-1; i+=2) {
-        printf("    [%u,%u)\n", polygon.rasterData.fullIntervals.at(i), polygon.rasterData.fullIntervals.at(i+1));
+        printf("    [%d,%d)\n", polygon.rasterData.fullIntervals.at(i), polygon.rasterData.fullIntervals.at(i+1));
     }
 
     return 0;
