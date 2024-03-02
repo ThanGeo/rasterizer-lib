@@ -4,6 +4,10 @@ int main(){
     // init dataspace with default settings
     rasterizerlib::init(-500,-400, 500, 400);
 
+    // set rasterization method to return raster cells instead of default intervals
+    rasterizerlib::setMethod(rasterizerlib::RM_RASTERIZATION);
+
+    // print configuration
     rasterizerlib::printConfig();
 
     // create list of points
@@ -32,14 +36,14 @@ int main(){
     rasterizerlib::generate(polygon);
 
     // print
-    printf("%ld ALL intervals: \n", polygon.rasterData.allIntervals.size()/2);
-    for(int i=0; i<polygon.rasterData.allIntervals.size()-1; i+=2) {
-        printf("    [%u,%u)\n", polygon.rasterData.allIntervals.at(i), polygon.rasterData.allIntervals.at(i+1));
+    printf("%ld ALL intervals: \n", polygon.rasterData.data.listA.size()/2);
+    for(int i=0; i<polygon.rasterData.data.listA.size()-1; i+=2) {
+        printf("    [%u,%u)\n", polygon.rasterData.data.listA.at(i), polygon.rasterData.data.listA.at(i+1));
     }
 
-    printf("%ld FULL intervals: \n", polygon.rasterData.fullIntervals.size()/2);
-    for(int i=0; i<polygon.rasterData.fullIntervals.size()-1; i+=2) {
-        printf("    [%u,%u)\n", polygon.rasterData.fullIntervals.at(i), polygon.rasterData.fullIntervals.at(i+1));
+    printf("%ld FULL intervals: \n", polygon.rasterData.data.listB.size()/2);
+    for(int i=0; i<polygon.rasterData.data.listB.size()-1; i+=2) {
+        printf("    [%u,%u)\n", polygon.rasterData.data.listB.at(i), polygon.rasterData.data.listB.at(i+1));
     }
 
     return 0;

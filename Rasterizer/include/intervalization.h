@@ -7,7 +7,7 @@
 
 namespace rasterizerlib
 {
-    void intervalization_begin(polygon2d &polygon);
+    void intervalizationBegin(polygon2d &polygon);
 
 }
 

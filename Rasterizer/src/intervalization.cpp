@@ -5,7 +5,7 @@ namespace rasterizerlib{
     std::vector<int> x_offset = { 1,1,1, 0,0,-1,-1,-1};
     std::vector<int> y_offset = {-1,0,1,-1,1,-1, 0, 1};
 
-    static int checkNeighbors(uint32_t &current_id, uint32_t &x, uint32_t &y, polygon2d &polygon, 
+    static int checkNeighborsInInterval(uint32_t &current_id, uint32_t &x, uint32_t &y, polygon2d &polygon, 
                                 std::vector<uint32_t> &fullIntervals, std::vector<uint32_t> &partialCells, 
                                 uint32_t cellsPerDim){
 
@@ -65,7 +65,7 @@ namespace rasterizerlib{
         while(current_partial_cell < partialCells.end()){		
             
             //check neighboring cells
-            res = checkNeighbors(current_id, x, y, polygon, fullIntervals, partialCells, cellsPerDim);
+            res = checkNeighborsInInterval(current_id, x, y, polygon, fullIntervals, partialCells, cellsPerDim);
 
             if(res == FULL){
                 //no need for pip test, it is full
@@ -112,8 +112,8 @@ namespace rasterizerlib{
         allIntervals.emplace_back(*(current_partial_cell-1) + 1);
 
         // store into the object
-        polygon.rasterData.allIntervals = allIntervals;
-        polygon.rasterData.fullIntervals = fullIntervals;
+        polygon.rasterData.data.listA = allIntervals;
+        polygon.rasterData.data.listB = fullIntervals;
     }
 
     static void intervalize(polygon2d &polygon, uint32_t cellsPerDim){
@@ -177,7 +177,7 @@ namespace rasterizerlib{
         // exit(0);
     } 
 
-    void intervalization_begin(polygon2d &polygon) {
+    void intervalizationBegin(polygon2d &polygon) {
         // safety checks
         if (!g_config.lib_init) {
             log_err("lib not initialized");

@@ -48,6 +48,8 @@ namespace rasterizerlib
 
     void init(double xMin, double yMin, double xMax, double yMax);
 
+    void setMethod(RasterizerMethodE method);
+
     void log_err(std::string errorText);
 
     

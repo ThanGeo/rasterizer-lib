@@ -48,6 +48,8 @@ namespace rasterizerlib
 
         setDataspace(xMin, yMin, xMax, yMax);
 
+        g_config.method = RM_INTERVALIZATION;
+
         g_config.lib_init = true;
     }
 
@@ -56,6 +58,9 @@ namespace rasterizerlib
         fprintf(stderr, msg.c_str());
     }
 
+    void setMethod(RasterizerMethodE method) {
+        g_config.method = method;
+    }
 
     polygon2d createPolygon(std::vector<point2d> &vertices) {
         polygon2d polygon;

@@ -9,6 +9,8 @@
 namespace rasterizerlib
 {
     uint32_t** calculatePartialAndUncertain(polygon2d &polygon, uint32_t &orderN);
+
+    void rasterizationBegin(polygon2d &polygon);
 }
 
 

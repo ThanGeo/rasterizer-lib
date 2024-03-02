@@ -9,7 +9,7 @@ namespace rasterizerlib
         // choose based on config
         switch (g_config.method) {
             case (RM_INTERVALIZATION):
-                intervalization_begin(polygon);
+                intervalizationBegin(polygon);
                 return;
             case (RM_RASTERIZATION):
             
