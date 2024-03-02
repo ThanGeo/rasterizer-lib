@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.5.0)
 project(example VERSION 1.0.0)
 
 if(MSVC)
@@ -23,11 +23,19 @@ set(SrcFiles
     example_april.cpp
 )
 
+# find boost
+find_package(Boost 1.50 REQUIRED COMPONENTS)
+
 list(LENGTH Executables cnt)
 math(EXPR len "${cnt} - 1")
 foreach(idx RANGE ${len})
     list(GET Executables ${idx} exec)
     list(GET SrcFiles ${idx} src)
+    # link boost
+    if(Boost_FOUND)
+        include_directories(${Boost_INCLUDE_DIRS})
+        #   add_executable(foo foo.cc)
+    endif()
     add_executable(${exec} ${src})
     target_link_libraries(${exec} Rasterizer)
 endforeach()
