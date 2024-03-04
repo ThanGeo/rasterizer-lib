@@ -29,14 +29,6 @@ namespace rasterizerlib
 
     void printConfig() {
         printf("Dataspace MBR: (%f,%f) to (%f,%f)\n", g_config.xMin, g_config.yMin, g_config.xMax, g_config.yMax);
-        switch (g_config.method) {
-            case RM_INTERVALIZATION:
-                printf("METHOD: INTERVALIZATION \n");
-                break;
-            case RM_RASTERIZATION:
-                printf("METHOD: RASTERIZATION \n");
-                break;
-        }
         switch (g_config.celEnumType) {
             case CE_HILBERT:
                 printf("CELL ENUM TYPE: HILBERT \n");
@@ -46,8 +38,12 @@ namespace rasterizerlib
 
     void init(double xMin, double yMin, double xMax, double yMax) {
 
+        // set data space bounds
         setDataspace(xMin, yMin, xMax, yMax);
 
+
+
+        // set init flag to true
         g_config.lib_init = true;
     }
 
@@ -55,7 +51,6 @@ namespace rasterizerlib
         std::string msg = "*** rasterizerlib fail: " + errorText + "\n";
         fprintf(stderr, msg.c_str());
     }
-
 
     polygon2d createPolygon(std::vector<point2d> &vertices) {
         polygon2d polygon;

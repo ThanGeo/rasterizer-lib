@@ -2,10 +2,7 @@
 
 
 namespace rasterizerlib{
-    std::vector<int> x_offset = { 1,1,1, 0,0,-1,-1,-1};
-    std::vector<int> y_offset = {-1,0,1,-1,1,-1, 0, 1};
-
-    static int checkNeighbors(uint32_t &current_id, uint32_t &x, uint32_t &y, polygon2d &polygon, 
+    static int checkNeighborsInInterval(uint32_t &current_id, uint32_t &x, uint32_t &y, polygon2d &polygon, 
                                 std::vector<uint32_t> &fullIntervals, std::vector<uint32_t> &partialCells, 
                                 uint32_t cellsPerDim){
 
@@ -65,7 +62,7 @@ namespace rasterizerlib{
         while(current_partial_cell < partialCells.end()){		
             
             //check neighboring cells
-            res = checkNeighbors(current_id, x, y, polygon, fullIntervals, partialCells, cellsPerDim);
+            res = checkNeighborsInInterval(current_id, x, y, polygon, fullIntervals, partialCells, cellsPerDim);
 
             if(res == FULL){
                 //no need for pip test, it is full
@@ -112,8 +109,8 @@ namespace rasterizerlib{
         allIntervals.emplace_back(*(current_partial_cell-1) + 1);
 
         // store into the object
-        polygon.rasterData.allIntervals = allIntervals;
-        polygon.rasterData.fullIntervals = fullIntervals;
+        polygon.rasterData.data.listA = allIntervals;
+        polygon.rasterData.data.listB = fullIntervals;
     }
 
     static void intervalize(polygon2d &polygon, uint32_t cellsPerDim){
@@ -123,12 +120,6 @@ namespace rasterizerlib{
 
         //first of all map the polygon's coordinates to this section's hilbert space
         mapPolygonToHilbert(polygon, cellsPerDim);
-
-        //print mapped polygon
-        // for(auto &it: polygon.vertices){
-        // 	cout << fixed << setprecision(10) << "(" << it.x << "," << it.y << ")" << endl;
-        // }
-        // cout << endl << endl;
 
         // compute partial cells
         uint32_t **M = calculatePartialAndUncertain(polygon, cellsPerDim);
@@ -142,42 +133,11 @@ namespace rasterizerlib{
         }
         delete M;
 
-        // cout << "PARTIAL" << endl;
-        // for(auto &it : polygon.partialCellPackage.hilbertCellIDs){		
-        // 	d2xy(HILBERT_n, it, x, y);
-        // 	cout << "(" << x << "," << y << ")" << endl;	
-        // }
-
         //compute all/full intervals
         computeAllAndFullIntervals(polygon, cellsPerDim, partialCells);
+    }
 
-        //print full
-        // cout << polygon.uncompressedF.size()/2 << " FULL INTERVALS, CELLS:" << endl;
-        // for(auto it = polygon.uncompressedF.begin(); it != polygon.uncompressedF.end(); it+=2){		
-        // 	// cout << "interval " << (polygon.uncompressedF.end() - it)/2 << "'s cells: " << endl;
-        // 	for(uint32_t val = *it; val < *(it+1); val++){
-        // 		d2xy(HILBERT_n, val, x, y);
-        // 		cout << "(" << x << "," << y << ")" << endl;	
-        // 	}
-        // 	// cout << endl;
-        // }
-
-        // //TO PRINT INTERVALS
-        // cout << "ALL and F intervals total: " << polygon.uncompressedALL.size() << " and " << polygon.uncompressedF.size() << endl;
-        // //print partial
-        // cout << "PARTIAL" << endl;
-        // for(auto it = polygon.uncompressedALL.begin(); it != polygon.uncompressedALL.end(); it+=2){		
-        // 	cout << "[" << *it << "," << *(it+1) << ")" << endl;
-        // }
-        // //print full
-        // cout << "FULL" << endl;
-        // for(auto it = polygon.uncompressedF.begin(); it != polygon.uncompressedF.end(); it+=2){		
-        // 	cout << "[" << *it << "," << *(it+1) << ")" << endl;
-        // }
-        // exit(0);
-    } 
-
-    void intervalization_begin(polygon2d &polygon) {
+    void intervalizationBegin(polygon2d &polygon) {
         // safety checks
         if (!g_config.lib_init) {
             log_err("lib not initialized");
@@ -189,5 +149,4 @@ namespace rasterizerlib{
         // proceed to intervalization
         intervalize(polygon, g_config.cellsPerDim);
     }
-
 }

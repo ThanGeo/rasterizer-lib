@@ -5,6 +5,9 @@
 
 namespace rasterizerlib
 {
+    extern std::vector<int> x_offset;
+    extern std::vector<int> y_offset;
+
     uint32_t xy2d (uint32_t n, uint32_t x, uint32_t y);
     void d2xy(uint32_t n, uint32_t d, uint32_t &x, uint32_t &y);
 

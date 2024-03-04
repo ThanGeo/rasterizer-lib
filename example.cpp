@@ -4,6 +4,7 @@ int main(){
     // init dataspace with default settings
     rasterizerlib::init(-500,-400, 500, 400);
 
+    // print configuration
     rasterizerlib::printConfig();
 
     // create list of points
@@ -28,19 +29,22 @@ int main(){
     // create a polygon
     rasterizerlib::polygon2d polygon = rasterizerlib::createPolygon(vertices);
 
-    // generate the raster based on the configuration
-    rasterizerlib::generate(polygon);
+    // generate the raster
+    rasterizerlib::generate(polygon, rasterizerlib::GT_RASTER);
 
     // print
-    printf("%ld ALL intervals: \n", polygon.rasterData.allIntervals.size()/2);
-    for(int i=0; i<polygon.rasterData.allIntervals.size()-1; i+=2) {
-        printf("    [%u,%u)\n", polygon.rasterData.allIntervals.at(i), polygon.rasterData.allIntervals.at(i+1));
+    // todo: draw for double check
+    printf("%ld Partial cells: \n", polygon.rasterData.data.listA.size());
+    for(int i=0; i<polygon.rasterData.data.listA.size(); i++) {
+        printf("%u,", polygon.rasterData.data.listA.at(i));
     }
+    printf("\n");
 
-    printf("%ld FULL intervals: \n", polygon.rasterData.fullIntervals.size()/2);
-    for(int i=0; i<polygon.rasterData.fullIntervals.size()-1; i+=2) {
-        printf("    [%u,%u)\n", polygon.rasterData.fullIntervals.at(i), polygon.rasterData.fullIntervals.at(i+1));
+    printf("%ld Full cells: \n", polygon.rasterData.data.listB.size());
+    for(int i=0; i<polygon.rasterData.data.listB.size(); i++) {
+        printf("%u,", polygon.rasterData.data.listB.at(i));
     }
+    printf("\n");
 
     return 0;
 }

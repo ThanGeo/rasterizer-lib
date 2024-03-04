@@ -13,7 +13,9 @@ namespace rasterizerlib
 {
     // boost geometry
     typedef boost::geometry::model::d2::point_xy<double> bg_point_xy;
+    typedef boost::geometry::model::d2::point_xy<uint32_t> bg_point_xy_uint;
     typedef boost::geometry::model::linestring<bg_point_xy> bg_linestring;
+    typedef boost::geometry::model::linestring<bg_point_xy_uint> bg_linestring_uint;
     typedef boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double> > bg_polygon;
 
     // custom
@@ -27,13 +29,24 @@ namespace rasterizerlib
         point2d minPoint, maxPoint;
     };
 
+    enum rasterDataTypeE
+    {
+        RD_CELL,
+        RD_INTERVAL
+    };
+
+    struct id_set
+    {
+        std::vector<uint32_t> listA;
+        std::vector<uint32_t> listB;
+    };
+
     struct raster_data
     {
         uint32_t minCellX, minCellY, maxCellX, maxCellY;
         uint32_t bufferWidth, bufferHeight;
-        
-        std::vector<uint32_t> allIntervals;
-        std::vector<uint32_t> fullIntervals;
+        rasterDataTypeE type;
+        id_set data;        // based on type, it either holds intervals (pairs of uint32_t ids) or cells (uin32_t ids)
     };
 
     struct polygon2d

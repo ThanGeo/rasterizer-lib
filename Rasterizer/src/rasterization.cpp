@@ -4,6 +4,7 @@
 
 namespace rasterizerlib
 {
+
     static inline bool checkY(double &y1, double &OGy1, double &OGy2, uint32_t &startCellY, uint32_t &endCellY){
         if(OGy1 < OGy2){
             return (startCellY <= y1 && y1 <= endCellY + 1);
@@ -73,11 +74,11 @@ namespace rasterizerlib
                 edgeLength = boost::geometry::length(ls);
 
                 //define NEAREST VERTICAL grid line
-                bg_linestring vertical{{startCellX+1, 0},{startCellX+1, cellsPerDim}};
+                bg_linestring_uint vertical{{startCellX+1, 0},{startCellX+1, cellsPerDim}};
                 
                 //define NEAREST HORIZONTAL grid line
                 y1 < y2 ? horizontalY = int(y1) + 1 : horizontalY = int(y1);
-                bg_linestring horizontal{{0, horizontalY},{cellsPerDim, horizontalY}};
+                bg_linestring_uint horizontal{{0, horizontalY},{cellsPerDim, horizontalY}};
 
                 //get intersection points with the vertical and nearest lines
                 boost::geometry::intersection(ls, vertical, output);
@@ -121,9 +122,180 @@ namespace rasterizerlib
         return M;
     }
 
+    static int checkNeighborsInCellList(uint32_t &current_id, uint32_t &x, uint32_t &y, polygon2d &polygon, 
+                                std::vector<uint32_t> &fullCells, std::vector<uint32_t> &partialCells, 
+                                uint32_t cellsPerDim){
 
+        if(fullCells.size() == 0){
+            return UNCERTAIN;
+        }
+        uint32_t d;
+        //4 neighbors
+        for(int i=0; i<x_offset.size(); i++){		
+            //if neighbor is out of bounds, ignore
+            if(x+x_offset.at(i) < polygon.rasterData.minCellX || x+x_offset.at(i) > polygon.rasterData.maxCellX || y+y_offset.at(i) < polygon.rasterData.minCellY || y+y_offset.at(i) > polygon.rasterData.maxCellY){
+                continue;
+            }
+
+            //get hilbert cell id
+            d = xy2d(cellsPerDim, x+x_offset.at(i), y+y_offset.at(i));
+            //if it has higher hilbert order, ignore
+            if(d >= current_id){
+                continue;
+            }
+            // if its a partial cell, ignore
+            if(binarySearchInVector(partialCells, d)){
+                //partial
+                continue;
+            }
+            //check if it is full
+            if(binarySearchInVector(fullCells, d)){
+                //full
+                return FULL;
+            }else{
+                //else its empty
+                return EMPTY;
+            }
+        }
+        return UNCERTAIN;
+    }
+
+    static void computeFullCells(polygon2d &polygon, uint32_t cellsPerDim, std::vector<uint32_t> &partialCells){
+        int res;
+        bool pip_res;
+        uint32_t x,y, current_id;
+        std::vector<uint32_t> fullCells;
+        clock_t timer;
+
+        //set first partial cell
+        auto current_partial_cell = partialCells.begin();
+        //set first interval start and starting uncertain cell (the next cell after the first partial interval)
+        while(*current_partial_cell == *(current_partial_cell+1) - 1){
+            current_partial_cell++;
+        }
+        current_id = *(current_partial_cell) + 1;
+        d2xy(cellsPerDim, current_id, x, y);
+        current_partial_cell++;
+
+        while(current_partial_cell < partialCells.end()){		
+            
+            //check neighboring cells
+            res = checkNeighborsInCellList(current_id, x, y, polygon, fullCells, partialCells, cellsPerDim);
+
+            if(res == FULL){
+                //no need for pip test, it is full
+                //this full interval ends at the next partial cell
+                // save all full cells from current_id up to current_partial_cell exclusive
+                for (uint32_t i = current_id; i < *current_partial_cell; i++) {
+                    fullCells.emplace_back(i);
+                }
+            }else if(res == EMPTY){
+                //current cell is empty	
+            }else{
+                //uncertain, must perform PiP test
+                bg_point_xy p(x, y);
+                pip_res = boost::geometry::within(p, polygon.bgPolygon);
+                if(pip_res){
+                    // current cell is full
+                    // this full interval ends at the next partial cell
+                    // save all full cells from current_id up to current_partial_cell exclusive
+                    for (uint32_t i = current_id; i < *current_partial_cell; i++) {
+                        fullCells.emplace_back(i);
+                    }
+                }
+            }
+
+            //get next partial and uncertain
+            while(*current_partial_cell == *(current_partial_cell+1) - 1){
+                current_partial_cell++;
+            }
+            current_id = *(current_partial_cell) + 1;
+            d2xy(cellsPerDim, current_id, x, y);
+            current_partial_cell++;
+        }
+
+        // store into the object
+        polygon.rasterData.data.listA = partialCells;
+        polygon.rasterData.data.listB = fullCells;
+    }
+
+    static void rasterizeEfficiently(polygon2d &polygon, uint32_t cellsPerDim){
+
+        uint32_t x,y;
+        clock_t timer;
+
+        //first of all map the polygon's coordinates to this section's hilbert space
+        mapPolygonToHilbert(polygon, cellsPerDim);
+
+        // compute partial cells
+        uint32_t **M = calculatePartialAndUncertain(polygon, cellsPerDim);
+        std::vector<uint32_t> partialCells;
+        partialCells = getPartialCellsFromMatrix(polygon, M);
+        //sort the cells by cell uint32_t 
+        sort(partialCells.begin(), partialCells.end());
+        // delete the matrix memory, not needed anymore
+        for(size_t i = 0; i < polygon.rasterData.bufferWidth; i++){
+            delete M[i];
+        }
+        delete M;
+
+        //compute full cells
+        computeFullCells(polygon, cellsPerDim, partialCells);
+    }
+
+    void rasterizationBegin(polygon2d &polygon) {
+        // safety checks
+        if (!g_config.lib_init) {
+            log_err("lib not initialized");
+        }
+        if (g_config.celEnumType != CE_HILBERT) {
+            log_err("no support for rasterization on non-hilbert grids");
+        }
+
+        // proceed to rasterization
+        rasterizeEfficiently(polygon, g_config.cellsPerDim);
+
+    }
+
+    static void rasterizeEfficientlyPartialOnly(polygon2d &polygon, uint32_t cellsPerDim){
+
+        uint32_t x,y;
+        clock_t timer;
+
+        //first of all map the polygon's coordinates to this section's hilbert space
+        mapPolygonToHilbert(polygon, cellsPerDim);
+
+        // compute partial cells
+        uint32_t **M = calculatePartialAndUncertain(polygon, cellsPerDim);
+        std::vector<uint32_t> partialCells;
+        partialCells = getPartialCellsFromMatrix(polygon, M);
+        //sort the cells by cell uint32_t 
+        sort(partialCells.begin(), partialCells.end());
+        // delete the matrix memory, not needed anymore
+        for(size_t i = 0; i < polygon.rasterData.bufferWidth; i++){
+            delete M[i];
+        }
+        delete M;
+
+        // store to object
+        polygon.rasterData.data.listA = partialCells;
+    }
+
+    void rasterizationPartialOnlyBegin(polygon2d &polygon) {
+        // safety checks
+        if (!g_config.lib_init) {
+            log_err("lib not initialized");
+        }
+        if (g_config.celEnumType != CE_HILBERT) {
+            log_err("no support for rasterization on non-hilbert grids");
+        }
+
+        // proceed to rasterization
+        rasterizeEfficientlyPartialOnly(polygon, g_config.cellsPerDim);
+
+    }
     
-
+    
 
 
 
