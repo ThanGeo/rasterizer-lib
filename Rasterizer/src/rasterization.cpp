@@ -227,12 +227,6 @@ namespace rasterizerlib
         //first of all map the polygon's coordinates to this section's hilbert space
         mapPolygonToHilbert(polygon, cellsPerDim);
 
-        //print mapped polygon
-        // for(auto &it: polygon.vertices){
-        // 	cout << fixed << setprecision(10) << "(" << it.x << "," << it.y << ")" << endl;
-        // }
-        // cout << endl << endl;
-
         // compute partial cells
         uint32_t **M = calculatePartialAndUncertain(polygon, cellsPerDim);
         std::vector<uint32_t> partialCells;
@@ -245,39 +239,8 @@ namespace rasterizerlib
         }
         delete M;
 
-        // cout << "PARTIAL" << endl;
-        // for(auto &it : polygon.partialCellPackage.hilbertCellIDs){		
-        // 	d2xy(HILBERT_n, it, x, y);
-        // 	cout << "(" << x << "," << y << ")" << endl;	
-        // }
-
         //compute full cells
         computeFullCells(polygon, cellsPerDim, partialCells);
-
-        //print full
-        // cout << polygon.uncompressedF.size()/2 << " FULL INTERVALS, CELLS:" << endl;
-        // for(auto it = polygon.uncompressedF.begin(); it != polygon.uncompressedF.end(); it+=2){		
-        // 	// cout << "interval " << (polygon.uncompressedF.end() - it)/2 << "'s cells: " << endl;
-        // 	for(uint32_t val = *it; val < *(it+1); val++){
-        // 		d2xy(HILBERT_n, val, x, y);
-        // 		cout << "(" << x << "," << y << ")" << endl;	
-        // 	}
-        // 	// cout << endl;
-        // }
-
-        // //TO PRINT INTERVALS
-        // cout << "ALL and F intervals total: " << polygon.uncompressedALL.size() << " and " << polygon.uncompressedF.size() << endl;
-        // //print partial
-        // cout << "PARTIAL" << endl;
-        // for(auto it = polygon.uncompressedALL.begin(); it != polygon.uncompressedALL.end(); it+=2){		
-        // 	cout << "[" << *it << "," << *(it+1) << ")" << endl;
-        // }
-        // //print full
-        // cout << "FULL" << endl;
-        // for(auto it = polygon.uncompressedF.begin(); it != polygon.uncompressedF.end(); it+=2){		
-        // 	cout << "[" << *it << "," << *(it+1) << ")" << endl;
-        // }
-        // exit(0);
     }
 
     void rasterizationBegin(polygon2d &polygon) {
@@ -294,6 +257,43 @@ namespace rasterizerlib
 
     }
 
+    static void rasterizeEfficientlyPartialOnly(polygon2d &polygon, uint32_t cellsPerDim){
+
+        uint32_t x,y;
+        clock_t timer;
+
+        //first of all map the polygon's coordinates to this section's hilbert space
+        mapPolygonToHilbert(polygon, cellsPerDim);
+
+        // compute partial cells
+        uint32_t **M = calculatePartialAndUncertain(polygon, cellsPerDim);
+        std::vector<uint32_t> partialCells;
+        partialCells = getPartialCellsFromMatrix(polygon, M);
+        //sort the cells by cell uint32_t 
+        sort(partialCells.begin(), partialCells.end());
+        // delete the matrix memory, not needed anymore
+        for(size_t i = 0; i < polygon.rasterData.bufferWidth; i++){
+            delete M[i];
+        }
+        delete M;
+
+        // store to object
+        polygon.rasterData.data.listA = partialCells;
+    }
+
+    void rasterizationPartialOnlyBegin(polygon2d &polygon) {
+        // safety checks
+        if (!g_config.lib_init) {
+            log_err("lib not initialized");
+        }
+        if (g_config.celEnumType != CE_HILBERT) {
+            log_err("no support for rasterization on non-hilbert grids");
+        }
+
+        // proceed to rasterization
+        rasterizeEfficientlyPartialOnly(polygon, g_config.cellsPerDim);
+
+    }
     
     
 

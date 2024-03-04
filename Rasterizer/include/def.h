@@ -18,7 +18,6 @@ namespace rasterizerlib
     typedef enum GenerateType{
         GT_APRIL_BEGIN = 0,
         GT_APRIL = GT_APRIL_BEGIN,
-        GT_APRIL_ALL_ONLY,
         GT_APRIL_END,
         GT_RASTER_BEGIN = 20,
         GT_RASTER = GT_RASTER_BEGIN,

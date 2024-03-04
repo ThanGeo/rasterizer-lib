@@ -7,6 +7,7 @@ A portable polygon rasterization library
 ## Version 1.0.0
 - supports direct build of the APRIL approximation for polygons
 - supports cell-based rasterization instead of APRIL intervals for polygons
+- - allows the generation of partial only cells if needed
 - identifies Partial (<100% coverage with polygon) and Full (100% covered by polygon) cells
 - uses a 2^N x 2^N grid, where cells are enumarated by the Hilbert Curve
 

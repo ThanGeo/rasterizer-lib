@@ -14,9 +14,6 @@ namespace rasterizerlib
                     // complete APRIL
                     intervalizationBegin(polygon);
                     break;
-                case GT_APRIL_ALL_ONLY:
-                    // only ALL intervals of APRIL
-                    break;
             }
         } else if (generateType >= GT_RASTER_BEGIN && generateType < GT_RASTER_END) {
             // RASTER
@@ -27,6 +24,7 @@ namespace rasterizerlib
                     break;
                 case GT_RASTER_PARTIAL_ONLY:
                     // only partial cell rasterization
+                    rasterizationPartialOnlyBegin(polygon);
                     break;
             }
         } else {
