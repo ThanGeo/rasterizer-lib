@@ -29,7 +29,7 @@ int main(){
     rasterizerlib::polygon2d polygon = rasterizerlib::createPolygon(vertices);
 
     // generate the raster based on the configuration
-    rasterizerlib::generate(polygon);
+    rasterizerlib::generate(polygon, rasterizerlib::GT_APRIL);
 
     // print
     printf("%ld ALL intervals: \n", polygon.rasterData.data.listA.size()/2);

@@ -15,10 +15,16 @@ namespace rasterizerlib
         CE_HILBERT,
     }CellEnumerationTypeE;
 
-    typedef enum RasterizerMethod{
-        RM_RASTERIZATION,
-        RM_INTERVALIZATION,
-    }RasterizerMethodE;
+    typedef enum GenerateType{
+        GT_APRIL_BEGIN = 0,
+        GT_APRIL = GT_APRIL_BEGIN,
+        GT_APRIL_ALL_ONLY,
+        GT_APRIL_END,
+        GT_RASTER_BEGIN = 20,
+        GT_RASTER = GT_RASTER_BEGIN,
+        GT_RASTER_PARTIAL_ONLY,
+        GT_RASTER_END
+    }GenerateTypeE;
 
     typedef struct config
     {
@@ -29,7 +35,6 @@ namespace rasterizerlib
         double xMin, yMin, xMax, yMax;
 
         // rasterization related
-        RasterizerMethodE method = RM_INTERVALIZATION;
         CellEnumerationTypeE celEnumType = CE_HILBERT;
         bool isGridSymmetrical = true;      // number of cells on X and Y axis is the same
         bool areCellsSquare;                // the cells of the grid are square (instead of rectangle)
@@ -47,8 +52,6 @@ namespace rasterizerlib
     polygon2d createPolygon(std::vector<point2d> &vertices);
 
     void init(double xMin, double yMin, double xMax, double yMax);
-
-    void setMethod(RasterizerMethodE method);
 
     void log_err(std::string errorText);
 

@@ -4,8 +4,6 @@
 
 namespace rasterizerlib
 {
-    std::vector<int> x_offset = { 1,1,1, 0,0,-1,-1,-1};
-    std::vector<int> y_offset = {-1,0,1,-1,1,-1, 0, 1};
 
     static inline bool checkY(double &y1, double &OGy1, double &OGy2, uint32_t &startCellY, uint32_t &endCellY){
         if(OGy1 < OGy2){
@@ -76,11 +74,11 @@ namespace rasterizerlib
                 edgeLength = boost::geometry::length(ls);
 
                 //define NEAREST VERTICAL grid line
-                bg_linestring vertical{{startCellX+1, 0},{startCellX+1, cellsPerDim}};
+                bg_linestring_uint vertical{{startCellX+1, 0},{startCellX+1, cellsPerDim}};
                 
                 //define NEAREST HORIZONTAL grid line
                 y1 < y2 ? horizontalY = int(y1) + 1 : horizontalY = int(y1);
-                bg_linestring horizontal{{0, horizontalY},{cellsPerDim, horizontalY}};
+                bg_linestring_uint horizontal{{0, horizontalY},{cellsPerDim, horizontalY}};
 
                 //get intersection points with the vertical and nearest lines
                 boost::geometry::intersection(ls, vertical, output);
@@ -187,10 +185,10 @@ namespace rasterizerlib
             if(res == FULL){
                 //no need for pip test, it is full
                 //this full interval ends at the next partial cell
-                
-                // TODO: save all full cells from current_id to current_partial_cell
-                fullIntervals.emplace_back(current_id);
-                fullIntervals.emplace_back(*current_partial_cell);
+                // save all full cells from current_id up to current_partial_cell exclusive
+                for (uint32_t i = current_id; i < *current_partial_cell; i++) {
+                    fullCells.emplace_back(i);
+                }
             }else if(res == EMPTY){
                 //current cell is empty	
             }else{
@@ -198,12 +196,12 @@ namespace rasterizerlib
                 bg_point_xy p(x, y);
                 pip_res = boost::geometry::within(p, polygon.bgPolygon);
                 if(pip_res){
-                    //current cell is full
-                    //this full interval ends at the next partial cell
-
-                    // TODO: save all full cells from current_id to current_partial_cell
-                    fullIntervals.emplace_back(current_id);
-                    fullIntervals.emplace_back(*current_partial_cell);
+                    // current cell is full
+                    // this full interval ends at the next partial cell
+                    // save all full cells from current_id up to current_partial_cell exclusive
+                    for (uint32_t i = current_id; i < *current_partial_cell; i++) {
+                        fullCells.emplace_back(i);
+                    }
                 }
             }
 
@@ -297,7 +295,7 @@ namespace rasterizerlib
     }
 
     
-
+    
 
 
 

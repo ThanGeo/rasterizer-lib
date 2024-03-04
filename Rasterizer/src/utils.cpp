@@ -2,6 +2,9 @@
 
 namespace rasterizerlib
 {
+    std::vector<int> x_offset = { 1,1,1, 0,0,-1,-1,-1};
+    std::vector<int> y_offset = {-1,0,1,-1,1,-1, 0, 1};
+
     // rotate/flip a quadrant appropriately
     inline void rot(uint32_t n, uint32_t &x, uint32_t &y, uint32_t rx, uint32_t ry) {
         if (ry == 0) {

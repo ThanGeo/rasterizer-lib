@@ -7,7 +7,7 @@
 
 namespace rasterizerlib
 {
-    void generate(polygon2d &polygon);
+    void generate(polygon2d &polygon, GenerateTypeE generateType);
 }
 
 #endif

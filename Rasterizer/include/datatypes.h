@@ -13,7 +13,9 @@ namespace rasterizerlib
 {
     // boost geometry
     typedef boost::geometry::model::d2::point_xy<double> bg_point_xy;
+    typedef boost::geometry::model::d2::point_xy<uint32_t> bg_point_xy_uint;
     typedef boost::geometry::model::linestring<bg_point_xy> bg_linestring;
+    typedef boost::geometry::model::linestring<bg_point_xy_uint> bg_linestring_uint;
     typedef boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double> > bg_polygon;
 
     // custom
