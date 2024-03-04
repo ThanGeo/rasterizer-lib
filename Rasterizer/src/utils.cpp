@@ -153,4 +153,8 @@ namespace rasterizerlib
         }
         return partialCells;
     }
+
+    bool checkIfPolygonIsInsideDataspace(polygon2d &polygon) {
+        return !(polygon.mbr.minPoint.x < g_config.xMin || polygon.mbr.minPoint.y < g_config.yMin || polygon.mbr.maxPoint.x > g_config.xMax || polygon.mbr.maxPoint.y > g_config.yMax);
+    }
 }

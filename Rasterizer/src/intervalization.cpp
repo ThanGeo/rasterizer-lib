@@ -139,9 +139,6 @@ namespace rasterizerlib{
 
     void intervalizationBegin(polygon2d &polygon) {
         // safety checks
-        if (!g_config.lib_init) {
-            log_err("lib not initialized");
-        }
         if (g_config.celEnumType != CE_HILBERT) {
             log_err("can't intervalize on non-hilbert grids");
         }

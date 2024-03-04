@@ -6,6 +6,15 @@ namespace rasterizerlib
     
 
     void generate(polygon2d &polygon, GenerateTypeE generateType) {
+        // safety checks
+        if (!g_config.lib_init) {
+            log_err("lib not initialized");
+        }
+        if(!checkIfPolygonIsInsideDataspace(polygon)){
+            log_err("Polygon is not copletely inside the pre-defined data space");
+            return;
+        }
+
         // choose based on config and generate type
         if (generateType >= GT_APRIL_BEGIN && generateType < GT_APRIL_END) {
             // APRIL

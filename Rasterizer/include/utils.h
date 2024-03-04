@@ -17,6 +17,8 @@ namespace rasterizerlib
     void mapPolygonToHilbert(polygon2d &pol, uint32_t cellsPerDim);
 
     std::vector<uint32_t> getPartialCellsFromMatrix(polygon2d &polygon, uint32_t **M);
+
+    bool checkIfPolygonIsInsideDataspace(polygon2d &polygon);
 }
 
 #endif

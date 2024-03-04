@@ -283,13 +283,9 @@ namespace rasterizerlib
 
     void rasterizationPartialOnlyBegin(polygon2d &polygon) {
         // safety checks
-        if (!g_config.lib_init) {
-            log_err("lib not initialized");
-        }
         if (g_config.celEnumType != CE_HILBERT) {
-            log_err("no support for rasterization on non-hilbert grids");
+            log_err("can't intervalize on non-hilbert grids");
         }
-
         // proceed to rasterization
         rasterizeEfficientlyPartialOnly(polygon, g_config.cellsPerDim);
 
