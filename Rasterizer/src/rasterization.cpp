@@ -74,11 +74,11 @@ namespace rasterizerlib
                 edgeLength = boost::geometry::length(ls);
 
                 //define NEAREST VERTICAL grid line
-                bg_linestring_uint vertical{{startCellX+1, 0},{startCellX+1, cellsPerDim}};
+                bg_linestring vertical{{startCellX+1, 0},{startCellX+1, cellsPerDim}};
                 
                 //define NEAREST HORIZONTAL grid line
                 y1 < y2 ? horizontalY = int(y1) + 1 : horizontalY = int(y1);
-                bg_linestring_uint horizontal{{0, horizontalY},{cellsPerDim, horizontalY}};
+                bg_linestring horizontal{{0, horizontalY},{cellsPerDim, horizontalY}};
 
                 //get intersection points with the vertical and nearest lines
                 boost::geometry::intersection(ls, vertical, output);

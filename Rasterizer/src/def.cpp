@@ -49,7 +49,7 @@ namespace rasterizerlib
 
     void log_err(std::string errorText) {
         std::string msg = "*** rasterizerlib fail: " + errorText + "\n";
-        fprintf(stderr, msg.c_str());
+        fprintf(stderr, "%s\n", msg.c_str());
     }
 
     polygon2d createPolygon(std::vector<point2d> &vertices) {

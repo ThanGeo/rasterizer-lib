@@ -11,6 +11,9 @@ set(SrcFiles
     src/utils.cpp
 )
 
+# supress warnings
+add_definitions(-w)
+
 # find boost
 find_package(Boost 1.50 REQUIRED COMPONENTS)
 if(Boost_FOUND)
